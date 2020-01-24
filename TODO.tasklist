@@ -1,0 +1,48 @@
+
+- 1 Colored bed per team
+- Soreboards
+  - Alive teams with green checked character
+  - Fully eliminated with red cross character
+  - Teams with players but without bed as yellow number
+- On kill, give killer 1 emerald
+- Create spawners (type and position from config.yml)
+  - Diamond
+    - 1 diamond every 15s
+    - radius: 1 (1x1 area)
+  - Gold
+    - 1 gold every 2s
+    - radius: 1 (1x1 area)
+  - Iron
+    - 1 iron every 1s
+    - radius: 1 (1x1 area)
+  - Base
+    - 1 iron every 0.5s
+    - 1 gold every 5s
+    - radius: 2 (3x3 area)
+- Shop
+  - Sign on wall
+    - Chest GUI menu
+  - Upgrades & Items
+    - Armor upgrade (lifetime / whole match), keep colored chestplate
+      - leather (1 gold)
+      - iron (16 gold)
+      - diamond (4 diamond)
+    - Bow
+      - No enchant (8 gold)
+      - Power I (24 gold)
+    - Arrows (4 = 2 gold)
+    - Fireball (32 iron)
+    - Building blocks
+      - Wool (8 = 8 iron), same color as the team
+      - Wooden planks (8 = 24 iron)
+      - End Stone (4 = 6 gold)
+      - Obsidian (1 = 1 emerald)
+    - Shears (24 iron)
+    - Pickaxe
+      - Stone Pickaxe (32 iron)
+      - Diamond Pickaxe (4 diamond)
+
+Additional features:
+- Upgrades of base spawner
+  - Maybe also other?
+- Additional shop items
