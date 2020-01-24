@@ -40,7 +40,7 @@ public class team {
 			playerTeams.remove(p.getName());
 		}
 	}
-	// check if player has a team
+	
 	public static boolean hasTeam(Player p){
 		return playerTeams.containsKey(p.getName());
 	}
