@@ -23,6 +23,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.material.Wool;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -42,7 +43,7 @@ public final class main extends JavaPlugin implements Listener{
 	public boolean SCVisible;
 	public static boolean inGame;
 	task task = new task();
-	
+
 	public void start() {
 		inGame=true;
 	}
@@ -50,7 +51,7 @@ public final class main extends JavaPlugin implements Listener{
 	public void onEnable() {
 		getLogger().info("plugin enabled");
 		getServer().getPluginManager().registerEvents(new joinEvent(this), this);
-		
+
 	}
 	public void gc() {
 		getLogger().info("okokokkn");
@@ -63,110 +64,125 @@ public final class main extends JavaPlugin implements Listener{
 	}
 
 	@Override 
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args)throws CommandException{
-
-		if(label.equalsIgnoreCase("bw")) {
-			if(args[0].equalsIgnoreCase("reload")) {
-				reload();
-			}
-			if(args[0].equalsIgnoreCase("start")) {
-				inGame=true;
-				task.runTaskTimer(this, 0, 1);
-			}
-			if(args[0].equalsIgnoreCase("stop")) {
-				inGame=false;
-				task.cancel();
-			}
-
-			if(sender instanceof Player) {
-				
-				
-				if(args[0].equalsIgnoreCase("spawner"))if(args[1].equalsIgnoreCase("create"))if(args[2].equalsIgnoreCase("teamSpawner")) {
-					Player p = (Player) sender;
-					Location loc = p.getLocation();
-					int o;
-					spawner.create(new spawner(p,"base"));
-				}
-
-				if(args[0].equalsIgnoreCase("team")) {
-
-					if(args[1].equalsIgnoreCase("create")) {
-						if(args[2].equalsIgnoreCase("red")) {team red =new team(args[3], ChatColor.RED); }
-						if(args[2].equalsIgnoreCase("dark_red")) {team dark_red=new team(args[3], ChatColor.DARK_RED);sender.sendMessage("New team was created \n "+"team: "+args[3]+" color: " + args[2]);}
-						if(args[2].equalsIgnoreCase("aqua")) {team aqua=new team(args[3], ChatColor.AQUA);sender.sendMessage("New team was created \n "+"team: "+args[3]+" color: " + args[2]);}
-						if(args[2].equalsIgnoreCase("dark_aqua")) {team dark_aqua=new team(args[3], ChatColor.DARK_AQUA);sender.sendMessage("New team was created \n "+"team: "+args[3]+" color: " + args[2]);}
-						if(args[2].equalsIgnoreCase("blue")) {team blue=new team(args[3], ChatColor.BLUE);sender.sendMessage("New team was created \n "+"team: "+args[3]+" color: " + args[2]);}
-						if(args[2].equalsIgnoreCase("dark_blue")) {team dark_blue=new team(args[3], ChatColor.DARK_BLUE);sender.sendMessage("New team was created \n "+"team: "+args[3]+" color: " + args[2]);}
-						if(args[2].equalsIgnoreCase("green")) {team green=new team(args[3], ChatColor.GREEN);sender.sendMessage("New team was created \n "+"team: "+args[3]+" color: " + args[3]);}
-						if(args[2].equalsIgnoreCase("dark_green")) {team dark_green=new team(args[3], ChatColor.DARK_GREEN);sender.sendMessage("New team was created \n "+"team: "+args[3]+" color: " + args[2]);}
-						if(args[2].equalsIgnoreCase("yellow")) {team yellow=new team(args[3], ChatColor.YELLOW);sender.sendMessage("New team was created \n "+"team: "+args[3]+" color: " + args[2]);}
-						if(args[2].equalsIgnoreCase("light_purple")) {team light_purple=new team(args[3], ChatColor.LIGHT_PURPLE);sender.sendMessage("New team was created \n "+"team: "+args[3]+" color: " + args[2]);}
-						if(args[2].equalsIgnoreCase("dark_purple")) {team dark_purple=new team(args[3], ChatColor.DARK_PURPLE);sender.sendMessage("New team was created \n "+"team: "+args[3]+" color: " + args[2]);}
-					}
-					if(args[1].equalsIgnoreCase("get")) {
-						team tmpTm = team.getTeams();	
-						if(args[2].equalsIgnoreCase(tmpTm.getTeamName())) {
-							sender.sendMessage("finded team "+tmpTm.getTeamName());
-						}
-
-					}
-					if(args[1].equalsIgnoreCase("join")) {
-						team tmpTm = team.getTeams();	
-						if(args[2].equalsIgnoreCase(tmpTm.getTeamName())) {
-							Player p = (Player) sender;
-							team.addPlayer(tmpTm, p);
-						}
-
-					}
-					if(args[1].equalsIgnoreCase("leave")) {
-						team tmpTm = team.getTeams();	
-						if(args[2].equalsIgnoreCase(tmpTm.getTeamName())) {
-							Player p = (Player) sender;
-							tmpTm.removePlayer(p);
-						}
-
-					}
-					if(args[1].equalsIgnoreCase("remove")) {
-						team tmpTm = team.getTeams();	
-						if(args[2].equalsIgnoreCase(tmpTm.getTeamName())) {
-							sender.sendMessage("deleting team "+tmpTm.getTeamName());
-							team.removeTeam(tmpTm);
-						}
-						if(!(args[2].equalsIgnoreCase(tmpTm.getTeamName()))) {
-							sender.sendMessage("team do not exists: "+tmpTm.getTeamName());
-
-						}
-
-					}
-				}
-
-				if(args[0].equalsIgnoreCase("info")) sender.sendMessage(ChatColor.AQUA+"INFO \n" + ChatColor.WHITE+"author: pavelstef \n "+"version: alpha");
-			} else
-				return true;
-		}
-		return false;
-	}
-
-	public void reload() {
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args){
 		try {
-		ScoreboardManager manager = Bukkit.getServer().getScoreboardManager();
-		Scoreboard board = manager.getNewScoreboard();
-		Objective objective = board.registerNewObjective("tst", "dummy");
-		Player p = (Player) Bukkit.getServer().getOnlinePlayers();
-		int i = 0;
-		p.sendMessage(getConfig().getString("onJoin.message"));
-		ScoreboardManager man = Bukkit.getServer().getScoreboardManager();
-		Scoreboard bo = manager.getNewScoreboard();
-		objective.setDisplayName(ChatColor.BOLD+""+ChatColor.GREEN+"Bedwars");
-		objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-		
+			if(label.equalsIgnoreCase("bw")||label.equalsIgnoreCase("bedwars")) {
+				if(args[0].equalsIgnoreCase("reload")) {
+					reload();
+				}
+				if(args[0].equalsIgnoreCase("start")) {
+					inGame=true;
+					task.runTaskTimer(this, 0, 1);
+				}
+				if(args[0].equalsIgnoreCase("stop")) {
+					inGame=false;
+					task.cancel();
+				}
 
-		Score sc1 = objective.getScore(ChatColor.AQUA+"Teams: "); 
-		sc1.setScore(1);
-		Score sc = objective.getScore(" "); 
-		sc.setScore(2);
-		p.setScoreboard(bo);
-		} catch (NullPointerException e) {}
+				if(sender instanceof Player) {
+
+
+					if(args[0].equalsIgnoreCase("spawner"))if(args[1].equalsIgnoreCase("create"))if(args[2].equalsIgnoreCase("teamSpawner")) {
+						Player p = (Player) sender;
+						Location loc = p.getLocation();
+						int o;
+						spawner.create(new spawner(p,"base"));
+					}
+					if(args[0].equalsIgnoreCase("glow")) {
+						Player p = (Player) sender;
+						Entity jarda = p.getLocation().getWorld().spawnEntity(p.getLocation(), EntityType.SHULKER);
+						jarda.setGlowing(true);
+						jarda.setInvulnerable(true);
+						jarda.setGravity(false);
+						jarda.setSilent(true);
+						
+						
+					}
+					if(args[0].equalsIgnoreCase("team")) {
+
+						if(args[1].equalsIgnoreCase("create")) {
+							if(args[2].equalsIgnoreCase("red")) {team red =new team(args[3], ChatColor.RED); }
+							if(args[2].equalsIgnoreCase("dark_red")) {team dark_red=new team(args[3], ChatColor.DARK_RED);sender.sendMessage("New team was created \n "+"team: "+args[3]+" color: " + args[2]);}
+							if(args[2].equalsIgnoreCase("aqua")) {team aqua=new team(args[3], ChatColor.AQUA);sender.sendMessage("New team was created \n "+"team: "+args[3]+" color: " + args[2]);}
+							if(args[2].equalsIgnoreCase("dark_aqua")) {team dark_aqua=new team(args[3], ChatColor.DARK_AQUA);sender.sendMessage("New team was created \n "+"team: "+args[3]+" color: " + args[2]);}
+							if(args[2].equalsIgnoreCase("blue")) {team blue=new team(args[3], ChatColor.BLUE);sender.sendMessage("New team was created \n "+"team: "+args[3]+" color: " + args[2]);}
+							if(args[2].equalsIgnoreCase("dark_blue")) {team dark_blue=new team(args[3], ChatColor.DARK_BLUE);sender.sendMessage("New team was created \n "+"team: "+args[3]+" color: " + args[2]);}
+							if(args[2].equalsIgnoreCase("green")) {team green=new team(args[3], ChatColor.GREEN);sender.sendMessage("New team was created \n "+"team: "+args[3]+" color: " + args[3]);}
+							if(args[2].equalsIgnoreCase("dark_green")) {team dark_green=new team(args[3], ChatColor.DARK_GREEN);sender.sendMessage("New team was created \n "+"team: "+args[3]+" color: " + args[2]);}
+							if(args[2].equalsIgnoreCase("yellow")) {team yellow=new team(args[3], ChatColor.YELLOW);sender.sendMessage("New team was created \n "+"team: "+args[3]+" color: " + args[2]);}
+							if(args[2].equalsIgnoreCase("light_purple")) {team light_purple=new team(args[3], ChatColor.LIGHT_PURPLE);sender.sendMessage("New team was created \n "+"team: "+args[3]+" color: " + args[2]);}
+							if(args[2].equalsIgnoreCase("dark_purple")) {team dark_purple=new team(args[3], ChatColor.DARK_PURPLE);sender.sendMessage("New team was created \n "+"team: "+args[3]+" color: " + args[2]);}
+						}
+						if(args[1].equalsIgnoreCase("get")) {
+							team tmpTm = team.getTeams();	
+							if(args[2].equalsIgnoreCase(tmpTm.getTeamName())) {
+								sender.sendMessage("finded team "+tmpTm.getTeamName());
+							}
+
+						}
+						if(args[1].equalsIgnoreCase("join")) {
+							team tmpTm = team.getTeams();	
+							if(args[2].equalsIgnoreCase(tmpTm.getTeamName())) {
+								Player p = (Player) sender;
+								team.addPlayer(tmpTm, p);
+							}
+
+						}
+						if(args[1].equalsIgnoreCase("leave")) {
+							team tmpTm = team.getTeams();	
+							if(args[2].equalsIgnoreCase(tmpTm.getTeamName())) {
+								Player p = (Player) sender;
+								tmpTm.removePlayer(p);
+							}
+
+						}
+						if(args[1].equalsIgnoreCase("remove")) {
+							team tmpTm = team.getTeams();	
+							if(args[2].equalsIgnoreCase(tmpTm.getTeamName())) {
+								sender.sendMessage("deleting team "+tmpTm.getTeamName());
+								team.removeTeam(tmpTm);
+							}
+							if(!(args[2].equalsIgnoreCase(tmpTm.getTeamName()))) {
+								sender.sendMessage("team do not exists: "+tmpTm.getTeamName());
+
+							}
+
+						}
+						return false;
+					}
+
+					if(args[0].equalsIgnoreCase("info")) sender.sendMessage(ChatColor.AQUA+"INFO \n" + ChatColor.WHITE+"author: pavelstef \n "+"version: alpha");
+				}
+					return false;
+			}
+			
+		} catch(Exception e) {
+			sender.sendMessage(ChatColor.BLUE+"[bedwars]"+ChatColor.RED+" invalid command");
+			
+		}
+		return true;
+		}
+
+		public void reload() {
+			try {
+				ScoreboardManager manager = Bukkit.getServer().getScoreboardManager();
+				Scoreboard board = manager.getNewScoreboard();
+				Objective objective = board.registerNewObjective("tst", "dummy");
+				Player p = (Player) Bukkit.getServer().getOnlinePlayers();
+				int i = 0;
+				p.sendMessage(getConfig().getString("onJoin.message"));
+				ScoreboardManager man = Bukkit.getServer().getScoreboardManager();
+				Scoreboard bo = manager.getNewScoreboard();
+				objective.setDisplayName(ChatColor.BOLD+""+ChatColor.GREEN+"Bedwars");
+				objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+
+
+				Score sc1 = objective.getScore(ChatColor.AQUA+"Teams: "); 
+				sc1.setScore(1);
+				Score sc = objective.getScore(" "); 
+				sc.setScore(2);
+				p.setScoreboard(bo);
+			} catch (NullPointerException e) {}
+		}
+
 	}
-
-}
