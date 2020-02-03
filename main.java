@@ -1,19 +1,29 @@
 package cz.stefan.bedwars;
 
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.material.Wool;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
@@ -21,58 +31,63 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
 
-public final class main extends JavaPlugin{
+
+
+
+
+
+
+
+public final class main extends JavaPlugin implements Listener{
 	public boolean SCVisible;
-	@EventHandler
-	public void onBlockPlace(BlockPlaceEvent event){
-		Player pl = event.getPlayer();
-		Block block = event.getBlock();
-		Material wool = Material.WHITE_WOOL;
-		if(block.getBlockData().getMaterial()==wool) {
-		if(team.getTeam(pl).getTeamColor()==ChatColor.RED) {
-		wool = Material.RED_WOOL;
-		}
-		block.setType(wool);
-		}
-		
+	public static boolean inGame;
+	task task = new task();
+	
+	public void start() {
+		inGame=true;
 	}
 	@Override
 	public void onEnable() {
 		getLogger().info("plugin enabled");
-
+		getServer().getPluginManager().registerEvents(new joinEvent(this), this);
+		
+	}
+	public void gc() {
+		getLogger().info("okokokkn");
 	}
 
 	@Override
 	public void onDisable() {
 		getLogger().info("plugin disabled");
+		inGame=false;
 	}
-	public void scoreBoard() {
-		team tmpTm = team.getTeams();	
-		ScoreboardManager manager = Bukkit.getScoreboardManager();
-		Scoreboard board = manager.getNewScoreboard();
-		Team tm = board.registerNewTeam(tmpTm.getTeamName());
-		tm.setColor(tmpTm.getTeamColor());
-		tm.setPrefix("["+tmpTm.getTeamName()+"] ");
-		Objective objective = board.registerNewObjective("BedWars", "dummy");
-		objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-		objective.setDisplayName("BedWars");
-		Score sc1 = objective.getScore("");
-		sc1.setScore(1);
-		Score sc2 = objective.getScore(""); 
-		sc2.setScore(2);
-	}
+
 	@Override 
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args){
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args)throws CommandException{
 
 		if(label.equalsIgnoreCase("bw")) {
+			if(args[0].equalsIgnoreCase("reload")) {
+				reload();
+			}
+			if(args[0].equalsIgnoreCase("start")) {
+				inGame=true;
+				task.runTaskTimer(this, 0, 1);
+			}
+			if(args[0].equalsIgnoreCase("stop")) {
+				inGame=false;
+				task.cancel();
+			}
 
 			if(sender instanceof Player) {
-				if(args[0].equalsIgnoreCase("scoreboard")) {
-					if(args[1].equalsIgnoreCase("true")) {
-						
-					}
+				
+				
+				if(args[0].equalsIgnoreCase("spawner"))if(args[1].equalsIgnoreCase("create"))if(args[2].equalsIgnoreCase("teamSpawner")) {
+					Player p = (Player) sender;
+					Location loc = p.getLocation();
+					int o;
+					spawner.create(new spawner(p,"base"));
 				}
-				if(args[0].equalsIgnoreCase("spawner"))if(args[1].equalsIgnoreCase("create"))if(args[2].equalsIgnoreCase("teamSpawner")) {}
+
 				if(args[0].equalsIgnoreCase("team")) {
 
 					if(args[1].equalsIgnoreCase("create")) {
@@ -132,6 +147,26 @@ public final class main extends JavaPlugin{
 		return false;
 	}
 
+	public void reload() {
+		try {
+		ScoreboardManager manager = Bukkit.getServer().getScoreboardManager();
+		Scoreboard board = manager.getNewScoreboard();
+		Objective objective = board.registerNewObjective("tst", "dummy");
+		Player p = (Player) Bukkit.getServer().getOnlinePlayers();
+		int i = 0;
+		p.sendMessage(getConfig().getString("onJoin.message"));
+		ScoreboardManager man = Bukkit.getServer().getScoreboardManager();
+		Scoreboard bo = manager.getNewScoreboard();
+		objective.setDisplayName(ChatColor.BOLD+""+ChatColor.GREEN+"Bedwars");
+		objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+		
 
+		Score sc1 = objective.getScore(ChatColor.AQUA+"Teams: "); 
+		sc1.setScore(1);
+		Score sc = objective.getScore(" "); 
+		sc.setScore(2);
+		p.setScoreboard(bo);
+		} catch (NullPointerException e) {}
+	}
 
 }
