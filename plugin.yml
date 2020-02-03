@@ -7,21 +7,5 @@ commands:
   
    
   bw:
-    scoreboard:
-      visible:
-        using: /bw scoreboard true/false
-    info:
-      discription: info about plugin
-    team:
-      create:
-        color:
-          name: 
-            discription: create team
-      get:
-        name:
-          discription: get team
-      remove:
-        name:
-          discription: remove team
-  
+     
   
