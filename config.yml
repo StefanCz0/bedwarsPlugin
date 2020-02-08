@@ -1,0 +1,11 @@
+onJoin:
+  message: Welcome to bedwars
+  player:
+    slot_0:
+      material: STICK
+      name: best stick
+      onClick: startGame
+    slot_1: 
+      material: RED_BED
+      name: best stick
+      onClick: startGame

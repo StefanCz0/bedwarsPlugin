@@ -2,10 +2,9 @@ name: bedwars
 main: cz.stefan.bedwars.main
 version: alpha
 author: pavelstef
-
 commands:
-  
-   
-  bw:
-     
-  
+  report:
+    description: reports player
+    usage: /report [<player>] 
+  bedwars:
+    aliases: [bw, bedw]
