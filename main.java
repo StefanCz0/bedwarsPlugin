@@ -2,15 +2,22 @@ package cz.stefan.bedwars;
 
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.EntityEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers.NBT;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -21,6 +28,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Wool;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
@@ -32,71 +40,70 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
 
-
-
-
-
-
-
-
 public final class main extends JavaPlugin implements Listener{
 	public boolean SCVisible;
 	public static boolean inGame;
-	task task = new task();
-
-	public void start() {
-		inGame=true;
-	}
+	
+	
+	public timer timer;
 	@Override
 	public void onEnable() {
 		getLogger().info("plugin enabled");
 		getServer().getPluginManager().registerEvents(new joinEvent(this), this);
+		timer = new timer(this);
+		
+		timer.runTaskTimer(this, 0, 20);
+	}
 
-	}
-	public void gc() {
-		getLogger().info("okokokkn");
-	}
 
 	@Override
 	public void onDisable() {
 		getLogger().info("plugin disabled");
 		inGame=false;
 	}
-
+	
 	@Override 
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args){
 		try {
+			if(label.equalsIgnoreCase("report")) {
+				if(args[0]==null) {
+					sender.sendMessage("you must define valid user");
+				} else {
+					Player reported = Bukkit.getServer().getPlayer(args[0]);
+					reported.sendMessage("You have been reported");
+				}
+			}
 			if(label.equalsIgnoreCase("bw")||label.equalsIgnoreCase("bedwars")) {
 				if(args[0].equalsIgnoreCase("reload")) {
 					reload();
 				}
 				if(args[0].equalsIgnoreCase("start")) {
 					inGame=true;
-					task.runTaskTimer(this, 0, 1);
+					Player p = (Player) sender;
+					
+
 				}
 				if(args[0].equalsIgnoreCase("stop")) {
 					inGame=false;
-					task.cancel();
+
 				}
 
 				if(sender instanceof Player) {
 
 
-					if(args[0].equalsIgnoreCase("spawner"))if(args[1].equalsIgnoreCase("create"))if(args[2].equalsIgnoreCase("teamSpawner")) {
+					if(args[0].equalsIgnoreCase("spawner"))if(args[1].equalsIgnoreCase("create")) {
+						if(args[2].equalsIgnoreCase("diamond")) {
+							Player p = (Player) sender;
+							Location loc = p.getLocation();
+							spawner sp = new spawner(SpawnerType.diamond, loc);
+							p.sendMessage("diamond spawner created");
+						}
+						if(args[2].equalsIgnoreCase("team")) {
 						Player p = (Player) sender;
 						Location loc = p.getLocation();
-						int o;
-						spawner.create(new spawner(p,"base"));
-					}
-					if(args[0].equalsIgnoreCase("glow")) {
-						Player p = (Player) sender;
-						Entity jarda = p.getLocation().getWorld().spawnEntity(p.getLocation(), EntityType.SHULKER);
-						jarda.setGlowing(true);
-						jarda.setInvulnerable(true);
-						jarda.setGravity(false);
-						jarda.setSilent(true);
-						
-						
+						spawner sp = new spawner(SpawnerType.team, loc);
+						p.sendMessage("team spawner created");
+						}
 					}
 					if(args[0].equalsIgnoreCase("team")) {
 
@@ -153,36 +160,36 @@ public final class main extends JavaPlugin implements Listener{
 
 					if(args[0].equalsIgnoreCase("info")) sender.sendMessage(ChatColor.AQUA+"INFO \n" + ChatColor.WHITE+"author: pavelstef \n "+"version: alpha");
 				}
-					return false;
+				return false;
 			}
-			
+
 		} catch(Exception e) {
 			sender.sendMessage(ChatColor.BLUE+"[bedwars]"+ChatColor.RED+" invalid command");
-			
+
 		}
 		return true;
-		}
-
-		public void reload() {
-			try {
-				ScoreboardManager manager = Bukkit.getServer().getScoreboardManager();
-				Scoreboard board = manager.getNewScoreboard();
-				Objective objective = board.registerNewObjective("tst", "dummy");
-				Player p = (Player) Bukkit.getServer().getOnlinePlayers();
-				int i = 0;
-				p.sendMessage(getConfig().getString("onJoin.message"));
-				ScoreboardManager man = Bukkit.getServer().getScoreboardManager();
-				Scoreboard bo = manager.getNewScoreboard();
-				objective.setDisplayName(ChatColor.BOLD+""+ChatColor.GREEN+"Bedwars");
-				objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-
-
-				Score sc1 = objective.getScore(ChatColor.AQUA+"Teams: "); 
-				sc1.setScore(1);
-				Score sc = objective.getScore(" "); 
-				sc.setScore(2);
-				p.setScoreboard(bo);
-			} catch (NullPointerException e) {}
-		}
-
 	}
+
+	public void reload() {
+		try {
+			ScoreboardManager manager = Bukkit.getServer().getScoreboardManager();
+			Scoreboard board = manager.getNewScoreboard();
+			Objective objective = board.registerNewObjective("tst", "dummy");
+			Player p = (Player) Bukkit.getServer().getOnlinePlayers();
+			int i = 0;
+			p.sendMessage(getConfig().getString("onJoin.message"));
+			ScoreboardManager man = Bukkit.getServer().getScoreboardManager();
+			Scoreboard bo = manager.getNewScoreboard();
+			objective.setDisplayName(ChatColor.BOLD+""+ChatColor.GREEN+"Bedwars");
+			objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+
+
+			Score sc1 = objective.getScore(ChatColor.AQUA+"Teams: "); 
+			sc1.setScore(1);
+			Score sc = objective.getScore(" "); 
+			sc.setScore(2);
+			p.setScoreboard(bo);
+		} catch (NullPointerException e) {}
+	}
+
+}

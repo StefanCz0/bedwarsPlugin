@@ -34,47 +34,28 @@ public class joinEvent implements Listener{
 
 		for(int k = 0; k<30; k++) {
 			try {
-			if(Material.getMaterial(m.getConfig().getString("onJoin.player.slot_"+k+".material"))!=null) {
-				ItemStack stack = new ItemStack(Material.getMaterial(m.getConfig().getString("onJoin.player.slot_"+k+".material")));
-				ItemMeta meta = stack.getItemMeta();
-				meta.setDisplayName(m.getConfig().getString("onJoin.player.slot_"+k+".name"));
-				event.getPlayer().getInventory().setItem(k, stack);
-			}}catch (NullPointerException e) {}
-		}
-		Objective objective = board.registerNewObjective("test", "dummy");
+				if(Material.getMaterial(m.getConfig().getString("onJoin.player.slot_"+k+".material"))!=null) {
+					ItemStack stack = new ItemStack(Material.getMaterial(m.getConfig().getString("onJoin.player.slot_"+k+".material")));
+					ItemMeta meta = stack.getItemMeta();
+					meta.setDisplayName(m.getConfig().getString("onJoin.player.slot_"+k+".name"));
+					event.getPlayer().getInventory().setItem(k, stack);
+				}}catch (NullPointerException e) {}
 
-		objective.setDisplayName(ChatColor.BOLD+""+ChatColor.GREEN+"Bedwars");
-		objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-		if(team.teamExists(1)) {
-			team.removeTeam(ts);
+			Objective objective = board.registerNewObjective("test", "dummy");
+
+			objective.setDisplayName(ChatColor.BOLD+""+ChatColor.GREEN+"Bedwars");
+			objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+
 			Score sc2 = objective.getScore(team.getTeamsColor(0)+team.getTeamsName(0));
 			sc2.setScore(0);
-		}else {
-			Score sc2 = objective.getScore(team.getTeamsColor(0)+team.getTeamsName(0));
-			sc2.setScore(0);}
 
-		Score sc1 = objective.getScore(ChatColor.AQUA+"Teams: "); 
-		sc1.setScore(1);
-		Score sc = objective.getScore(" "); 
-		sc.setScore(2);
-		p.setScoreboard(board);
-	}
-	@EventHandler
-	public void onInventoryClick(InventoryClickEvent e) {
-		for(int k = 0; k<30; k++) {
-			try {
-			if(Material.getMaterial(m.getConfig().getString("onJoin.player.slot_"+k+".material"))!=null) {
-				Player p = (Player)e.getWhoClicked();
-				ItemStack stack = new ItemStack(Material.getMaterial(m.getConfig().getString("onJoin.player.slot_"+k+".material")));
-				if(p.getItemInHand()==stack) {
-					if(m.getConfig().getString("onJoin.player.slot_"+k+".onClick")=="startGame") {
-						if(team.getTeam(p).getTeamName()=="ADMIN") {m.start(); p.sendMessage("game started");}
-					}
-				}
-				
-	
-				
-			}}catch (NullPointerException ex) {}
+			Score sc1 = objective.getScore(ChatColor.AQUA+"Teams: "); 
+			sc1.setScore(1);
+			Score sc = objective.getScore(" "); 
+			sc.setScore(2);
+			p.setScoreboard(board);
 		}
 	}
+	
+	
 }

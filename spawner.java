@@ -1,66 +1,54 @@
 package cz.stefan.bedwars;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitScheduler;
-
-
 
 public class spawner{
-	
-	static ArrayList<spawner> spawners = new ArrayList<spawner>();
-	public static Player p;
-	public String type;
+	public SpawnerType type;
 	public Location loc;
-	public spawner(Player p, String type){
-	this.p=p;
-	this.type=type;
+	public static ArrayList<spawner> list = new ArrayList<spawner>();
+	public spawner(SpawnerType type, Location loc) {
+		this.loc = loc;
+		this.type = type;
+		list.add(this);
 	}
-	public static void create(spawner sp){
-	   sp.setLocation(p.getLocation());
-	   spawners.add(sp);  
-	}
-	public static spawner getSpawner() {
-		spawner tempSpawner = null;
-		for(int i = 0; i<spawners.size();i++) {
-			tempSpawner = spawners.get(i);
+	public static spawner getSpawners(SpawnerType p) {
+		spawner sp=null;
+		for(int i = 0; i< list.size(); i++) {
+			if(list.get(i).getType()==p) {
+				sp =list.get(i);
+			}
 		}
-		return tempSpawner;
-		
-		
+		return sp;
 	}
-	public void spawn(){
-	  if(main.inGame){
-	  if(type=="base"){ 
-	    BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-	        scheduler.scheduleSyncDelayedTask((Plugin) this, new Runnable() {
-	            @Override
-	            public void run() {
-	                p.getWorld().dropItemNaturally(getLocation(), new ItemStack(Material.IRON_INGOT));
-	            }
-	        }, 10L);
-	        scheduler.scheduleSyncDelayedTask((Plugin) this, new Runnable() {
-	            @Override
-	            public void run() {
-	                p.getWorld().dropItemNaturally(getLocation(), new ItemStack(Material.GOLD_INGOT));
-	            }
-	        }, 100L);
-	        }
-	    }
+	public void spawn() {
+		if(this.type==SpawnerType.diamond) {
+			ItemStack diamond = new ItemStack(Material.DIAMOND);
+			loc.getWorld().dropItem(loc, diamond);
+		}
+		if(this.type==SpawnerType.iron) {
+			ItemStack iron = new ItemStack(Material.IRON_INGOT);
+			loc.getWorld().dropItem(loc, iron);
+		}
+		if(this.type==SpawnerType.gold) {
+			ItemStack gold = new ItemStack(Material.GOLD_INGOT);
+			loc.getWorld().dropItem(loc, gold);
+		}
+		if(this.type==SpawnerType.team) {
+			ItemStack iron = new ItemStack(Material.IRON_INGOT);
+			loc.getWorld().dropItem(loc, iron);
+			ItemStack gold = new ItemStack(Material.GOLD_INGOT);
+			loc.getWorld().dropItem(loc, gold);
+		}
 	}
-	public Location getLocation(){
-	  return loc;
+	public Location getLoc() {
+		return loc;
 	}
-	public void setLocation(Location l){
-	  l = loc;
+	public SpawnerType getType() {
+		return type;
 	}
-	
 }
