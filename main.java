@@ -5,6 +5,7 @@ import org.bukkit.plugin.PluginManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -43,16 +44,25 @@ import org.bukkit.scoreboard.Team;
 public final class main extends JavaPlugin implements Listener{
 	public boolean SCVisible;
 	public static boolean inGame;
-	
-	
+	public static ArrayList<spawner> list = new ArrayList<spawner>();
+
 	public timer timer;
+	public static spawner getSpawners(SpawnerType p) {
+		spawner sp=null;
+		for(int i = 0; i< list.size(); i++) {
+			if(list.get(i).getType()==p) {
+				sp =list.get(i);
+			}
+		}
+		return sp;
+	}
 	@Override
 	public void onEnable() {
 		getLogger().info("plugin enabled");
 		getServer().getPluginManager().registerEvents(new joinEvent(this), this);
 		timer = new timer(this);
-		
-		timer.runTaskTimer(this, 0, 20);
+
+		timer.runTaskTimer(this, 0, 10);
 	}
 
 
@@ -61,17 +71,24 @@ public final class main extends JavaPlugin implements Listener{
 		getLogger().info("plugin disabled");
 		inGame=false;
 	}
-	
+
 	@Override 
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args){
 		try {
 			if(label.equalsIgnoreCase("report")) {
-				if(args[0]==null) {
-					sender.sendMessage("you must define valid user");
-				} else {
-					Player reported = Bukkit.getServer().getPlayer(args[0]);
-					reported.sendMessage("You have been reported");
+
+
+				Player reporter = (Player) sender;
+				Player reported = Bukkit.getServer().getPlayer(args[0]);
+				for(Player p : Bukkit.getOnlinePlayers()) {
+					if(p.isOp()) {
+						p.sendMessage("["+ChatColor.RED+"BW!"+ChatColor.RESET+"]"+" "+reporter.getName()+" reported "+reported.getName());
+
+					}
 				}
+
+				reported.sendMessage("You have been reported");
+
 			}
 			if(label.equalsIgnoreCase("bw")||label.equalsIgnoreCase("bedwars")) {
 				if(args[0].equalsIgnoreCase("reload")) {
@@ -80,7 +97,7 @@ public final class main extends JavaPlugin implements Listener{
 				if(args[0].equalsIgnoreCase("start")) {
 					inGame=true;
 					Player p = (Player) sender;
-					
+
 
 				}
 				if(args[0].equalsIgnoreCase("stop")) {
@@ -94,15 +111,23 @@ public final class main extends JavaPlugin implements Listener{
 					if(args[0].equalsIgnoreCase("spawner"))if(args[1].equalsIgnoreCase("create")) {
 						if(args[2].equalsIgnoreCase("diamond")) {
 							Player p = (Player) sender;
-							Location loc = p.getLocation();
-							spawner sp = new spawner(SpawnerType.diamond, loc);
+							list.add(new spawner(SpawnerType.diamond, p.getLocation(),list.size()+1));
 							p.sendMessage("diamond spawner created");
 						}
 						if(args[2].equalsIgnoreCase("team")) {
-						Player p = (Player) sender;
-						Location loc = p.getLocation();
-						spawner sp = new spawner(SpawnerType.team, loc);
-						p.sendMessage("team spawner created");
+							Player p = (Player) sender;
+							list.add(new spawner(SpawnerType.team, p.getLocation(),list.size()+1));
+							p.sendMessage("team spawner created");
+						}
+						if(args[2].equalsIgnoreCase("gold")) {
+							Player p = (Player) sender;
+							list.add(new spawner(SpawnerType.gold, p.getLocation(),list.size()+1));
+							p.sendMessage("gold spawner created");
+						}
+						if(args[2].equalsIgnoreCase("iron")) {
+							Player p = (Player) sender;
+							list.add(new spawner(SpawnerType.iron, p.getLocation(),list.size()+1));
+							p.sendMessage("iron spawner created");
 						}
 					}
 					if(args[0].equalsIgnoreCase("team")) {
